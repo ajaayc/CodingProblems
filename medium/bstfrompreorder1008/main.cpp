@@ -1,5 +1,7 @@
 #include <queue>
 #include <iostream>
+#include <stack>
+#include <limits>
 #define COUNT 10 
 
 using namespace std;
@@ -26,6 +28,8 @@ class BTree{
     
 public:
     BTree():root(NULL){}
+
+    BTree(TreeNode* root):root(root){}
 
     ~BTree(){
         cleanTree(root);
@@ -131,47 +135,58 @@ void print2D(TreeNode *root)
  *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
  * };
  */
+
+//This solution uses O(log n) avg, O(n) worst case memory for stack frames due to the recursion
+//It takes O(n) time since it traverses each node at most twice
 class Solution {
 public:
-    //'r','l'
-    void bstToGstHelper2(TreeNode* root, char child){
-        if(child == 'l'){
-            
-        }
-        else{
-
-        }
-    }
-
-    void bstToGstHelper(TreeNode* root){
-        bstToGstHelper2(root,'l');
-        bstToGstHelper2(root,'r');
-    }
-    
-    TreeNode* bstToGst(TreeNode* root) {
-        bstToGst(root);
+    void bstFromPreorder(const vector<int>& preorder, int& currIndex, const int lb, const int rb,TreeNode* const currNode) {
+        if(currIndex >= static_cast<int>(preorder.size())) return;
         
+        //Go to the left
+        if(preorder[currIndex] < currNode->val && lb < preorder[currIndex] && preorder[currIndex] < rb){
+            TreeNode* node2Add = new TreeNode(preorder[currIndex]);
+            int newRb = currNode->val;
+            currNode->left = node2Add;
+            TreeNode* childNode = currNode->left;
+            bstFromPreorder(preorder, ++currIndex, lb, newRb, childNode);
+        }
+
+        if(currIndex >= static_cast<int>(preorder.size())) return;
+
+        //Go to the right
+        if(preorder[currIndex] >= currNode->val && lb < preorder[currIndex] && preorder[currIndex] < rb){
+            TreeNode* node2Add = new TreeNode(preorder[currIndex]);
+            int newLb = currNode->val;
+            currNode->right = node2Add;
+            TreeNode* childNode = currNode->right;
+            bstFromPreorder(preorder, ++currIndex, newLb, rb, childNode);
+        }
+    }
+
+    TreeNode* bstFromPreorder(vector<int>& preorder) {
+        TreeNode* root = new TreeNode(preorder[0]);
+        if(preorder.size() == 1)
+            return root;
+        
+        int currIndex = 1;
+        bstFromPreorder(preorder,currIndex,std::numeric_limits<int>::min(),std::numeric_limits<int>::max(),root);
+
         return root;
     }
-
-    
 };
 
 int main(){
-    BTree t;
-    t.insert(4);
-    t.insert(1);
-    t.insert(6);
-    t.insert(0);
-    t.insert(2);
-    t.insert(3);
-    t.insert(5);
-    t.insert(7);
-    t.insert(8);
+    std::vector<int> preOrder = {8,5,1,7,10,12};
+    //std::vector<int> preOrder = {8,5,1,7,10,9,12,11};
+    //std::vector<int> preOrder = {12,10,3,0,1,6,16,13,15,14,21,20};
+    
+    Solution s;
+    TreeNode* root = s.bstFromPreorder(preOrder);
 
-    TreeNode* root = t.getRootNode();
-    cout << "Original Tree" << endl;
+    cout << "Constructed Tree" << endl;
     print2D(root);
 
-    //Solution s;
+    //Encapsulate in BTree so that memory is freed by BTree destructor
+    BTree b(root);
 }
