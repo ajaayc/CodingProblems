@@ -29,13 +29,12 @@ public:
     unsigned p1 = 1, p2 = n;
 
     int temp;
-    while(p1 < nums.size()){
+    while(p1 < p2){
       temp = nums[p2];
 
       for(unsigned i = p2 - 1; i >= p1; --i){
 	nums[i+1] = nums[i];
       }
-      
       nums[p1] = temp;
 
       p1 += 2;
