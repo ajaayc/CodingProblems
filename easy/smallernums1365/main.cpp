@@ -1,6 +1,7 @@
 #include <unordered_set>
 #include <iostream>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -14,26 +15,45 @@ void printVec(const std::vector<T>& vec){
 }
 
 /*
-  O(N^2) solution and O(N) memory, where N is nums.size().
-  Can we do this in place so that we use O(1) memory?
-  Ignoring the memory usage for the output, can we decrease the
-  time complexity via an extra data structure?
-  Can we reduce time complexity without an extra data structure?
+  O(N Log N) time and O(N) memory, where N is nums.size().
+  This solution creates a mapping of values in nums
+  to the count of all values in nums that are lower.
+
+  The bulk of the time complexity is in creating the mapping.
+  Is the time complexity the best it can be? Do we need to 
+  sort the values in nums (requires N log N time) or can
+  sorting be avoided?
  */
 class Solution {
 public:
     vector<int> smallerNumbersThanCurrent(vector<int>& nums) {
       vector<int> output(nums.size(), 0);
+      std::map<int,int> countMap;
 
+      //O(N Log N) to make map
       for(unsigned i = 0; i < nums.size(); ++i){
-	//Loop through all elements and count which ones are smaller
-	for(unsigned j = 0; j < nums.size(); ++j){
-	  if(nums[j] < nums[i]){
-	    ++output[i];
-	  }
-	}
+	++countMap[nums[i]];
       }
 
+      int prevCount = 0;
+      int count = 0;
+
+      //O(N) to create cumulative map
+      //Loop through countMap and make it a cumulative sum map
+      //i.e. for each i in countMap.keys, countMap[i] = count
+      //of all values in nums that are less than i.
+      for(auto it = countMap.begin(); it != countMap.end(); ++it){
+	prevCount = it->second;
+	it->second = count;
+
+	count += prevCount;
+      }
+
+      //Loop through intput and assign values to output based on the map
+      for(unsigned i = 0; i < nums.size(); ++i){
+	output[i] = countMap[nums[i]];
+      }
+      
       return output;
     }
 };
