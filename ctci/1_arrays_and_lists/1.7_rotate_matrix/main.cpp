@@ -47,23 +47,60 @@ public:
     return out;
   }
 
+  //Helper recursive function for rotateMatInPlace
+  void rotateMatInPlaceHelper(std::vector<std::vector<T>>& input, unsigned begin, unsigned end, unsigned size){
+    //Base case. If size is odd, then begin == end will become true (i.e. the matrix core). If size is even, begin > end can become true.
+    if(begin >= end){
+      return;
+    }
+    //Do rotation algorithm. Rotate outer shell of matrix
+    //Loop from begin up to but not including end. The reason for this is
+    //that the end element is actually the beginning of the range of the
+    //side that is being "rotated into." If we include end, we get a double
+    //rotation on the corners of the matrix
+    for(unsigned i = begin; i < end; ++i){
+      //Get row, column of four locations
+      unsigned topr, topc;
+      unsigned rightr, rightc;
+      unsigned bottomr, bottomc;
+      unsigned leftr, leftc;
+      
+      //Top
+      topr = begin; topc = i;
+      //Right
+      rightr = i; rightc = end;
+      //Bottom
+      bottomr = end; bottomc = end - i + begin;
+      //Left
+      leftr = end - i + begin; leftc = begin;
+
+      //Cycle
+      T tempLeftRotatedValue = input[leftr][leftc];
+      
+      //Bottom goes to left
+      input[leftr][leftc] = input[bottomr][bottomc];
+
+      //Right goes to bottom
+      input[bottomr][bottomc] = input[rightr][rightc];
+	
+      //Top goes to right
+      input[rightr][rightc] = input[topr][topc];
+
+      //Temp (left) goes to top
+      input[topr][topc] = tempLeftRotatedValue;
+    }
+    
+    //Rotate on next shell inside matrix
+    rotateMatInPlaceHelper(input, begin + 1, end - 1, size);
+  }
+
   //Recursive solution
   //Uses O(N^2) time and O(1) memory.
   void rotateMatInPlace(std::vector<std::vector<T>>& input, unsigned size){
+    rotateMatInPlaceHelper(input, 0, size - 1, size);
     return;
   }
 
-
-  //Helper recursive function for rotateMatInPlace
-  void rotateMatInPlaceHelper(std::vector<std::vector<T>>& input, unsigned begin, unsigned end){
-    //Base case. Need to review this
-    if((begin == end) || (begin + 1 == end)){
-      return;
-    }
-    //Do rotation algorithm
-
-    //Call this function again with begin + 1 and end - 1 as the new begin and end.
-  }
   
 };
 
