@@ -33,8 +33,74 @@ void printVec(const std::vector<T>& vec){
 template <typename T>
 class Solution {
 public:
+  //This solution creates a reversed version of the input list
+  //and then compares the input and reversed list node by node.
+  //Uses O(N) time, O(N) memory, where N is the number of nodes
+  //in the input list.
   //Assumes that the list is not empty
   bool isPalindrome(ListNode<T>* head) {
+    std::stack<ListNode<T>*> s;
+
+    unsigned numNodes = 0;
+    
+    //Reverse the list with a stack
+    ListNode<T>* curr = head;
+    while(curr != nullptr){
+      s.push(new ListNode<T>(curr->val, nullptr));
+      curr = curr->next;
+      ++numNodes;
+    }
+
+    //Create reversed list
+    ListNode<T>* rhead = s.top();
+    s.pop();
+
+    curr = rhead;
+    
+    while(!s.empty()){
+      ListNode<T>* next = s.top();
+      s.pop();
+
+      curr->next = next;
+      curr = curr->next;
+    }
+    
+    //Go through list in order and compare to values in stack for palindrome
+    ListNode<T>* curr1 = head;
+    ListNode<T>* curr2 = rhead;
+    
+    bool isPal = true;
+    unsigned nodeCount = 0;
+    
+    //Loop through input and reversed input
+    while(curr1 != nullptr){
+      if(curr1->val != curr2->val){
+	isPal = false;
+	break;
+      }
+      
+      ++nodeCount;
+
+      //Small optimization to avoid looping through whole list
+      if(nodeCount == (numNodes / 2)){
+	break;
+      }
+      
+      curr1 = curr1->next;
+      curr2 = curr2->next;
+    }
+
+    freeListRecursive(rhead);
+
+    return isPal;
+  }
+
+  //This version uses a stack and the values in the input list
+  //to determine if the list is a palindrome.
+  //Uses O(N) time, O(N) memory, where N is the number of nodes
+  //in the input list.
+  //Assumes that the list is not empty
+  bool isPalindromeStack(ListNode<T>* head) {
     /* To be implemented*/
     std::stack<T> s;
 
@@ -48,7 +114,7 @@ public:
     curr = head;
     T currVal, listCurrVal;
 
-    
+
     bool isPal = true;
     while(curr != nullptr){
       currVal = s.top();
@@ -59,12 +125,13 @@ public:
 	isPal = false;
 	break;
       }
-      
+
       curr = curr->next;
     }
-    
+
     return isPal;
   }
+
 };
 
 template <typename T>
@@ -166,6 +233,18 @@ int main(){
   input = {'a','b','a'};
   processTest(input);
 
+  input = {1,0,0,1,0,0,1,0,1,0,0,1,0,0,1};
+  processTest(input);
+
+  input = {1,0,0,1,0,0,1,0,0,0,0,1,0,0,1};
+  processTest(input);
+
+  input = {1,0,0,1,0,0,1,1,0,0,1,0,0,1};
+  processTest(input);
+
+  input = {1,0,0,1,0,0,0,1,0,0,1,0,0,1};
+  processTest(input);
+  
   std::vector<char> input2;
 
   input2 = {'a','b','a'};
