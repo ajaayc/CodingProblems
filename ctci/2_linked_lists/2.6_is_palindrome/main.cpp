@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <stack>
+#include <cassert>
 
 using namespace std;
 
@@ -33,6 +34,73 @@ void printVec(const std::vector<T>& vec){
 template <typename T>
 class Solution {
 public:
+  //Ass
+  unsigned getListLength(ListNode<T>* head){
+    unsigned length = 0;
+
+    ListNode<T>* curr = head;
+    while(curr != nullptr){
+      ++length;
+      curr = curr->next;
+    }
+
+    return length;
+  }
+
+  bool isPalindromeRecHelper(ListNode<T>* head, const unsigned totalLength, unsigned currLength, ListNode<T>*& tail){
+    ++currLength;
+
+    //Very special case to prevent seg fault
+    if(totalLength == 1){
+      return true;
+    }
+    
+    //Base Case:
+    //Stop recursion at middle of the list
+    if(currLength == totalLength / 2){
+      if(totalLength % 2 == 0){
+	//Check head->next for equality
+	tail = head->next;
+      }
+    
+      else if(totalLength % 2 == 1){
+	//Check head->next->next
+	tail = head->next->next;
+      }
+      
+      return head->val == tail->val;
+    }
+
+
+    bool isSublistPal = isPalindromeRecHelper(head->next, totalLength, currLength, tail);
+
+    //Else compare tail->next and head's value
+    tail = tail->next;
+    assert(tail != nullptr);
+
+    return isSublistPal && (head->val == tail->val);
+  }
+  
+  //SOLUTION 3
+  //This is a recursive solution which uses O(N) memory for stack
+  //frames, and O(N) time, where N is the number of nodes in the linked
+  //list pointed to by head.
+  //This solution first counts the number of nodes in the list. Then,
+  //it recurses the list until it reaches the N/2'th node. After it
+  //reaches that level, a tail node is populated that refers to the last
+  //node of the current "sublist".
+  //the recursion then bubbles up and repeatedly checks if the current
+  //head and tail nodes are equal, updating tail to tail->next each time
+  //the recursive call returns.
+  bool isPalindromeRec(ListNode<T>* head){
+    //Get length of the list
+    unsigned totalLength = getListLength(head);
+    
+    ListNode<T>* tail;
+    return isPalindromeRecHelper(head, totalLength, 0, tail);
+  }
+  
+  //SOLUTION 2
   //This solution creates a reversed version of the input list
   //and then compares the input and reversed list node by node.
   //Uses O(N) time, O(N) memory, where N is the number of nodes
@@ -95,6 +163,7 @@ public:
     return isPal;
   }
 
+  //SOLUTION 1
   //This version uses a stack and the values in the input list
   //to determine if the list is a palindrome.
   //Uses O(N) time, O(N) memory, where N is the number of nodes
@@ -190,7 +259,7 @@ void processTest(std::vector<T>& input){
   std::cout << "Input:\n";
   printVec(input);
   ListNode<T>* in = listFromVec(input);
-  output = s.isPalindrome(in);
+  output = s.isPalindromeRec(in);
   std::cout << "Output:\n";
   std::cout << (output ? "true" : "false") << std::endl;
 
