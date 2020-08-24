@@ -45,130 +45,52 @@ public:
     }
 
     return length;
-  }
-
-  bool isPalindromeRecHelper(ListNode<T>* head, const unsigned totalLength, unsigned currLength, ListNode<T>*& tail){
-    ++currLength;
-
-    //Very special case to prevent seg fault
-    if(totalLength == 1){
-      return true;
-    }
-    
-    //Base Case:
-    //Stop recursion at middle of the list
-    if(currLength == totalLength / 2){
-      if(totalLength % 2 == 0){
-	//Check head->next for equality
-	tail = head->next;
-      }
-    
-      else if(totalLength % 2 == 1){
-	//Check head->next->next
-	tail = head->next->next;
-      }
-      
-      return head->val == tail->val;
-    }
-
-
-    bool isSublistPal = isPalindromeRecHelper(head->next, totalLength, currLength, tail);
-
-    //Else compare tail->next and head's value
-    tail = tail->next;
-    assert(tail != nullptr);
-
-    return isSublistPal && (head->val == tail->val);
-  }
+  }  
   
-  //SOLUTION 3
-  //This is a recursive solution which uses O(N) memory for stack
-  //frames, and O(N) time, where N is the number of nodes in the linked
-  //list pointed to by head.
-  //This solution first counts the number of nodes in the list. Then,
-  //it recurses the list until it reaches the N/2'th node. After it
-  //reaches that level, a tail node is populated that refers to the last
-  //node of the current "sublist".
-  //the recursion then bubbles up and repeatedly checks if the current
-  //head and tail nodes are equal, updating tail to tail->next each time
-  //the recursive call returns.
-  bool isPalindromeRec(ListNode<T>* head){
-    //Get length of the list
-    unsigned totalLength = getListLength(head);
-    
-    ListNode<T>* tail;
-    return isPalindromeRecHelper(head, totalLength, 0, tail);
-  }
-
-  //SOLUTION 6
-  //This solution reverses the input list via recursion, then does
-  //node by node comparison. Unlike solution 2, there is no literal stack.
-  
-  //SOLUTION 5
-  //This solution uses a stack and the two pointer technique.
-  //We use a fast and a slow pointer to determine where the
-  //middle of the list is, meanwhile adding nodes to a stack.
-  //Then we compare the second half of the list to the values
-  //in the stack
-  //Assuming list is not empty
-  bool isPalindromeTwoPointer(ListNode<T>* head){
-    ListNode<T>* slow;
-    ListNode<T>* fast;
-    slow = head;
-    fast = head;
-
+  //SOLUTION 1
+  //This version uses a stack and the values in the input list
+  //to determine if the list is a palindrome.
+  //Uses O(N) time, O(N) memory, where N is the number of nodes
+  //in the input list.
+  //Assumes that the list is not empty
+  bool isPalindromeStack(ListNode<T>* head) {
+    /* To be implemented*/
     std::stack<T> s;
-    
-    //Check for size 1 list. Code will still handle a size 1
-    //list but, this is a more explicit check
-    if(head->next == nullptr){
-      return true;
-    }
-    
-    while(fast != nullptr && (fast->next != nullptr)){
-      assert(slow != nullptr);
-      s.push(slow->val);
-	
-      slow = slow->next;
-      fast = fast->next->next;
+
+    ListNode<T>* curr = head;
+    while(curr != nullptr){
+      s.push(curr->val);
+      curr = curr->next;
     }
 
-    //slow will be in the middle of the list, either at middle
-    //if odd no of elements or at first element of second half
-    //if even no of elements.
-
-    //if fast == nullptr, there is even number of elements in list
-    //and slow will be in first element of second half of list.
-    //if fast->next == nullptr, there is an odd number of elements
-    //in the list, and slow must be incremented to enter the second half.
-    if(fast != nullptr && fast->next == nullptr){
-      slow = slow->next;
-    }
+    //Go through list in order and compare to values in stack for palindrome
+    curr = head;
+    T currVal, listCurrVal;
 
     bool isPal = true;
-    //Compare second half of the list to whatever is in the stack
-    while(!s.empty() && slow != nullptr){
-      T next = s.top();
+    while(curr != nullptr){
+      currVal = s.top();
       s.pop();
 
-      if(next != slow->val){
+      listCurrVal = curr->val;
+      if(currVal != listCurrVal){
 	isPal = false;
 	break;
       }
 
-      slow = slow->next;
+      curr = curr->next;
     }
 
     return isPal;
   }
-  
+
   //SOLUTION 2
   //This solution creates a reversed version of the input list
-  //and then compares the input and reversed list node by node.
+  //via a loop and then compares the input and reversed list node by node.
   //Uses O(N) time, O(N) memory, where N is the number of nodes
   //in the input list.
   //Assumes that the list is not empty
-  bool isPalindrome(ListNode<T>* head) {
+  bool isPalindromeReverseIter(ListNode<T>* head) {
     std::stack<ListNode<T>*> s;
 
     unsigned numNodes = 0;
@@ -225,44 +147,176 @@ public:
     return isPal;
   }
 
-  //SOLUTION 1
-  //This version uses a stack and the values in the input list
-  //to determine if the list is a palindrome.
-  //Uses O(N) time, O(N) memory, where N is the number of nodes
-  //in the input list.
-  //Assumes that the list is not empty
-  bool isPalindromeStack(ListNode<T>* head) {
-    /* To be implemented*/
-    std::stack<T> s;
+  //SOLUTION 3
+  //This is a recursive solution which uses O(N) memory for stack
+  //frames, and O(N) time, where N is the number of nodes in the linked
+  //list pointed to by head.
+  //This solution first counts the number of nodes in the list. Then,
+  //it recurses the list until it reaches the N/2'th node. After it
+  //reaches that level, a tail node is populated that refers to the last
+  //node of the current "sublist".
+  //the recursion then bubbles up and repeatedly checks if the current
+  //head and tail nodes are equal, updating tail to tail->next each time
+  //the recursive call returns.
+  bool isPalindromeRec(ListNode<T>* head){
+    //Get length of the list
+    unsigned totalLength = getListLength(head);
+    
+    ListNode<T>* tail;
+    return isPalindromeRecHelper(head, totalLength, 0, tail);
+  }
 
-    ListNode<T>* curr = head;
-    while(curr != nullptr){
-      s.push(curr->val);
-      curr = curr->next;
+  bool isPalindromeRecHelper(ListNode<T>* head, const unsigned totalLength, unsigned currLength, ListNode<T>*& tail){
+    ++currLength;
+
+    //Very special case to prevent seg fault
+    if(totalLength == 1){
+      return true;
+    }
+    
+    //Base Case:
+    //Stop recursion at middle of the list
+    if(currLength == totalLength / 2){
+      if(totalLength % 2 == 0){
+	//Check head->next for equality
+	tail = head->next;
+      }
+    
+      else if(totalLength % 2 == 1){
+	//Check head->next->next
+	tail = head->next->next;
+      }
+      
+      return head->val == tail->val;
     }
 
-    //Go through list in order and compare to values in stack for palindrome
-    curr = head;
-    T currVal, listCurrVal;
 
+    bool isSublistPal = isPalindromeRecHelper(head->next, totalLength, currLength, tail);
+
+    //Else compare tail->next and head's value
+    tail = tail->next;
+    assert(tail != nullptr);
+
+    return isSublistPal && (head->val == tail->val);
+  }
+  
+  //SOLUTION 4
+  //This solution uses a stack and the two pointer technique.
+  //We use a fast and a slow pointer to determine where the
+  //middle of the list is, meanwhile adding nodes to a stack.
+  //Then we compare the second half of the list to the values
+  //in the stack
+  //Uses O(N) memory for the stack, and O(N) time to
+  //loop through the list
+  //Assuming list is not empty
+  bool isPalindromeTwoPointer(ListNode<T>* head){
+    ListNode<T>* slow;
+    ListNode<T>* fast;
+    slow = head;
+    fast = head;
+
+    std::stack<T> s;
+    
+    //Check for size 1 list. Code will still handle a size 1
+    //list but, this is a more explicit check
+    if(head->next == nullptr){
+      return true;
+    }
+    
+    while(fast != nullptr && (fast->next != nullptr)){
+      assert(slow != nullptr);
+      s.push(slow->val);
+	
+      slow = slow->next;
+      fast = fast->next->next;
+    }
+
+    //slow will be in the middle of the list, either at middle
+    //if odd no of elements or at first element of second half
+    //if even no of elements.
+
+    //if fast == nullptr, there is even number of elements in list
+    //and slow will be in first element of second half of list.
+    //if fast->next == nullptr, there is an odd number of elements
+    //in the list, and slow must be incremented to enter the second half.
+    if(fast != nullptr && fast->next == nullptr){
+      slow = slow->next;
+    }
 
     bool isPal = true;
-    while(curr != nullptr){
-      currVal = s.top();
+    //Compare second half of the list to whatever is in the stack
+    while(!s.empty() && slow != nullptr){
+      T next = s.top();
       s.pop();
 
-      listCurrVal = curr->val;
-      if(currVal != listCurrVal){
+      if(next != slow->val){
 	isPal = false;
 	break;
       }
 
-      curr = curr->next;
+      slow = slow->next;
     }
 
     return isPal;
   }
 
+  //SOLUTION 5
+  //This solution reverses the input list via recursion, then does
+  //node by node comparison. Unlike solution 2, there is no literal stack.
+  //O(N) time, O(N) memory for recursion to reverse and store a reversed
+  //version of the input list.
+  bool isPalindromeReverseRec(ListNode<T>* head){
+    //Reverse the input list
+    ListNode<T>* revHead = reverseList(head);
+    
+    //Loop through both lists side by side
+    ListNode<T>* curr = head;
+    ListNode<T>* revCurr = revHead;
+
+    bool listIsPalindrome = true;
+    while(curr != nullptr){
+      assert(revCurr != nullptr);
+      
+      if(curr->val != revCurr->val){
+	listIsPalindrome = false;
+	break;
+      }
+
+      curr = curr->next;
+      revCurr = revCurr->next;
+    }
+    
+    freeListRecursive(revHead);
+
+    return listIsPalindrome;
+  }
+
+
+  ListNode<T>* reverseList(ListNode<T>* head){
+    ListNode<T>* tail;
+    return reverseListHelper(head, tail);
+  }
+
+  //Creates a reversed version of the input list via recursion
+  //Assumes input is not empty
+  ListNode<T>* reverseListHelper(ListNode<T>* head, ListNode<T>*& tail){
+    if(head->next == nullptr){
+      ListNode<T>* newHead = new ListNode<T>(head->val);
+      tail = newHead;
+      return newHead;
+    }
+
+    //Reverse the list starting at head->next and then add
+    //head to the end of it via the tail
+    ListNode<T>* reversed = reverseListHelper(head->next, tail);
+
+    //Create new node from copy of head
+    ListNode<T>* copy = new ListNode<T>(head->val);
+    tail->next = copy;
+    tail = tail->next;
+    
+    return reversed;
+  }
 };
 
 template <typename T>
@@ -321,7 +375,7 @@ void processTest(std::vector<T>& input){
   std::cout << "Input:\n";
   printVec(input);
   ListNode<T>* in = listFromVec(input);
-  output = s.isPalindromeTwoPointer(in);
+  output = s.isPalindromeReverseRec(in);
   std::cout << "Output:\n";
   std::cout << (output ? "true" : "false") << std::endl;
 
