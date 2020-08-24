@@ -99,6 +99,68 @@ public:
     ListNode<T>* tail;
     return isPalindromeRecHelper(head, totalLength, 0, tail);
   }
+
+  //SOLUTION 6
+  //This solution reverses the input list via recursion, then does
+  //node by node comparison. Unlike solution 2, there is no literal stack.
+  
+  //SOLUTION 5
+  //This solution uses a stack and the two pointer technique.
+  //We use a fast and a slow pointer to determine where the
+  //middle of the list is, meanwhile adding nodes to a stack.
+  //Then we compare the second half of the list to the values
+  //in the stack
+  //Assuming list is not empty
+  bool isPalindromeTwoPointer(ListNode<T>* head){
+    ListNode<T>* slow;
+    ListNode<T>* fast;
+    slow = head;
+    fast = head;
+
+    std::stack<T> s;
+    
+    //Check for size 1 list. Code will still handle a size 1
+    //list but, this is a more explicit check
+    if(head->next == nullptr){
+      return true;
+    }
+    
+    while(fast != nullptr && (fast->next != nullptr)){
+      assert(slow != nullptr);
+      s.push(slow->val);
+	
+      slow = slow->next;
+      fast = fast->next->next;
+    }
+
+    //slow will be in the middle of the list, either at middle
+    //if odd no of elements or at first element of second half
+    //if even no of elements.
+
+    //if fast == nullptr, there is even number of elements in list
+    //and slow will be in first element of second half of list.
+    //if fast->next == nullptr, there is an odd number of elements
+    //in the list, and slow must be incremented to enter the second half.
+    if(fast != nullptr && fast->next == nullptr){
+      slow = slow->next;
+    }
+
+    bool isPal = true;
+    //Compare second half of the list to whatever is in the stack
+    while(!s.empty() && slow != nullptr){
+      T next = s.top();
+      s.pop();
+
+      if(next != slow->val){
+	isPal = false;
+	break;
+      }
+
+      slow = slow->next;
+    }
+
+    return isPal;
+  }
   
   //SOLUTION 2
   //This solution creates a reversed version of the input list
@@ -259,7 +321,7 @@ void processTest(std::vector<T>& input){
   std::cout << "Input:\n";
   printVec(input);
   ListNode<T>* in = listFromVec(input);
-  output = s.isPalindromeRec(in);
+  output = s.isPalindromeTwoPointer(in);
   std::cout << "Output:\n";
   std::cout << (output ? "true" : "false") << std::endl;
 
@@ -270,6 +332,9 @@ int main(){
   std::vector<int> input;
 
   input = {1,0,1};  
+  processTest(input);
+
+  input = {1,0,0};  
   processTest(input);
 
   input = {0};
@@ -288,6 +353,9 @@ int main(){
   processTest(input);
 
   input = {1,1,1,1};
+  processTest(input);
+
+  input = {1,1,1,0,1};
   processTest(input);
 
   input = {1,0,0,0,0};
