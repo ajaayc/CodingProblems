@@ -34,7 +34,8 @@ void printVec(const std::vector<T>& vec){
 template <typename T>
 class Solution {
 public:
-  //Ass
+  //Gets the length of the input list in O(N) time, O(1) memory
+  //where N is the number of nodes in the list
   unsigned getListLength(ListNode<T>* head){
     unsigned length = 0;
 
@@ -371,13 +372,21 @@ void freeListRecursive(ListNode<T>*& head){
 template <typename T>
 void processTest(std::vector<T>& input){
   Solution<T> s;
-  int output;
   std::cout << "Input:\n";
   printVec(input);
   ListNode<T>* in = listFromVec(input);
-  output = s.isPalindromeReverseRec(in);
-  std::cout << "Output:\n";
-  std::cout << (output ? "true" : "false") << std::endl;
+
+  std::vector<bool> results;
+  results.push_back(s.isPalindromeStack(in));
+  results.push_back(s.isPalindromeReverseIter(in));
+  results.push_back(s.isPalindromeRec(in));
+  results.push_back(s.isPalindromeTwoPointer(in));
+  results.push_back(s.isPalindromeReverseRec(in));
+
+  std::cout << "Output with various methods:\n";
+  for(bool currResult : results){
+    std::cout << (currResult ? "true" : "false") << std::endl;
+  }
 
   freeListRecursive(in);
 }
