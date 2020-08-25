@@ -6,13 +6,18 @@ CC = g++
 #  -Wall turns on most, but not all, compiler warnings
 CXXFLAGS  = -Wall -Werror -pedantic -std=c++11 -g
 
+# $(wildcard *.cpp /xxx/xxx/*.cpp): get all .cpp files from the current directory and dir "/xxx/xxx/"
+SRCS := $(wildcard *.cpp)
+
+SRCS_H := $(wildcard *.h)
+
 # the build target executable:
 TARGET = main
 
 all: $(TARGET)
 
-$(TARGET): $(TARGET).cpp
-	$(CC) $(CXXFLAGS) $(TARGET).cpp -o $(TARGET)
+$(TARGET): $(SRCS) $(SRCS_H)
+	$(CC) $(CXXFLAGS) $(SRCS) -o $(TARGET)
 
 val: all
 	valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes ./main
