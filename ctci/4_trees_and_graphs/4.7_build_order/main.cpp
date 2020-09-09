@@ -15,6 +15,25 @@ void printVec(const std::vector<T>& vec){
   std::cout << std::endl;
 }
 
+//TODO Implement Alternate Solution
+/*
+What if we do a topological sort by storing in each node the number
+of nodes that it depends on? Maintain a queue of nodes to be processed.
+Start off by adding the nodes with 0 dependencies to the queue.
+While queue is not empty, get the front element, consider it built,
+decrement number of dependencies for all of its children, and if one of
+the children would then have 0 dependencies, add it to the queue.
+If the queue is empty but there are still nodes that haven't been built
+yet i.e. they have more than 0 dependencies, then we have a build error i.e.
+a cycle. This is because we know that we have processed as many nodes possible
+and satisfied as many dependencies as we possibly could...if there are still nodes
+that have dependencies even after the algorithm, that implies they are contained
+within their own cycles and there was no way to reach them in the build order.
+
+See CTCI Pg 250 Solution 1 for reference. The algorithm I implemented here
+is CTCI's suggested Solution 2 for this problem.
+*/
+
 template <typename T>
 class Graph{
 public:
