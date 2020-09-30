@@ -25,11 +25,56 @@ class SolutionDuplicateChars : public Solution{
 public:
   virtual void getPermutations(const string& in, std::vector<string>& perms){
     return;
-
   }
 
   virtual string getMethod(){
-    return "--Permutations Duplicate Chars--";
+    return "--Permutations with Duplicate Chars--";
+  }
+};
+
+//O((N + 1)!) time
+//O(N) memory
+//N is the length of the input string.
+class SolutionNoDuplicateChars_V2 : public Solution{
+public:
+  virtual void getPermutations(const string& inStr, std::vector<string>& perms){
+    string inStrCopy(inStr);
+    getPermutationsHelper(inStrCopy, perms, 0);
+    return;
+  }
+
+  virtual void getPermutationsHelper(string& in, std::vector<string>& perms, unsigned index){
+    /*
+    //Base case. Putting the base case here adds an extra recursive call, which can be avoided
+    //by inserting the base case in the main loop
+    //extra recursive call.
+    if(index == in.size() - 1){
+      perms.push_back(in);
+      return;
+    }
+    */
+
+    for(unsigned currIndex = index; currIndex < in.size(); ++currIndex){
+      //Swap currIndex with first character to signify making a "choice"
+      std::swap(in[index], in[currIndex]);
+
+      //Base Case. Putting it inside this loop eliminates an unnecessary recursive call,
+      if((index + 1) == in.size() - 1){
+	perms.push_back(in);
+      }
+
+      else{
+	//Permute and make choices for substring
+	getPermutationsHelper(in, perms, index + 1);
+      }
+      
+      //Undo swap
+      std::swap(in[currIndex], in[index]);
+    }
+  }
+
+  virtual string getMethod(){
+    return "--Permutations Duplicate Chars Version 2--";
   }
 };
 
@@ -95,7 +140,8 @@ void processTest(string in, vector<Solution*> sols){
 int main(){
   Solution* s1 = new SolutionNoDuplicateChars();
   //Solution* s2 = new SolutionDuplicateChars();
-  std::vector<Solution*> sols = {s1};
+  Solution* s3 = new SolutionNoDuplicateChars_V2();
+  std::vector<Solution*> sols = {s1, s3};
 
   processTest("abcd", sols);
 
