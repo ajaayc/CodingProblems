@@ -1,69 +1,92 @@
-#include <unordered_set>
-#include <iostream>
 #include <vector>
-#include <map>
-
-using namespace std;
+#include <iostream>
 
 template <typename T>
 void printVec(const std::vector<T>& vec){
   for(auto it = vec.begin(); it != vec.end(); ++it){
     std::cout << *it << " ";
   }
-  
   std::cout << std::endl;
 }
 
 template <typename T>
 void printMat(const std::vector<std::vector<T>>& mat){
-  for(unsigned row = 0; row < mat.size(); ++row){
-    printVec(mat[row]);
+  for(auto it = mat.begin(); it != mat.end(); ++it){
+    printVec(*it);
   }
 }
 
-template <typename T>
-class Solution {
+class Solution{
 public:
-  std::vector<std::vector<T>> zeroMat(const std::vector<std::vector<T>>& input, unsigned numRows, unsigned numCols) {
-    std::vector<std::vector<T>> out;
+  //Let r = number of rows in input. Let c = num Cols in output
+  //This algorithm uses O(rc) memory and O(r^2 + rc) time...or O(max(r^2,c^2)) time. i.e.
+  //If r > c, the algorithm is O(r^2) time and if c > r, the algorithm is O(c^2) time.
+  std::vector<std::vector<int>> zeroMatrix(const std::vector<std::vector<int>>& input, unsigned numRows, unsigned numCols){
+    std::vector<int> tempRow(numCols, -1);
+    std::vector<std::vector<int>> output(numRows, tempRow);
 
-    return out;
+    for(unsigned currRow = 0; currRow < numRows; ++currRow){
+      for(unsigned currCol = 0; currCol < numCols; ++currCol){
+	if(input[currRow][currCol] == 0){
+	  //Zero out row r in output
+	  for(unsigned currColInOutput = 0; currColInOutput < numCols; ++currColInOutput){
+	    output[currRow][currColInOutput] = 0;
+	  }
+
+	  //Zero out col c in output
+	  for(unsigned currRowInOutput = 0; currRowInOutput < numRows; ++currRowInOutput){
+	    output[currRowInOutput][currCol] = 0;
+	  }
+
+	  //Go to next row
+	  break;
+	}
+	
+	else if(output[currRow][currCol] != 0){
+	  output[currRow][currCol] = input[currRow][currCol];
+	}
+	
+      }
+    }
+
+    return output;
   }
 };
 
-enum Choice{
-  INPLACE,NOTINPLACE
-};
-
-template <typename T>
-void processTest(std::vector<std::vector<T>> input, unsigned numRows, unsigned numCols, Choice c){
-  Solution<int> s;
-  std::vector<std::vector<T>> output;
-  if(c == INPLACE)
-    std::cout << "--In Place Test Case--" << std::endl;
-  else if(c == NOTINPLACE)
-    std::cout << "--Not In Place Test Case--" << std::endl;    
-
-  std::cout << "Input:\n";
+void processTest(const std::vector<std::vector<int>>& input){
+  Solution s;
+  std::vector<std::vector<int>> output;
+  output = s.zeroMatrix(input, input.size(), input[0].size());
+  std::cout << "Input:" << std::endl;
   printMat(input);
-  /*
-  std::cout << "Output:\n";
-  if(c == NOTINPLACE){
-    output = s.zeroMat(input, size);
-    printMat(output);
-  }
-  */
-  /*
-  else if(c == INPLACE){
-    s.rotateMatInPlace(input, size);
-    printMat(input);
-  }
-  */
-  std::cout << std::endl;
+  std::cout << "Output:" << std::endl;
+  printMat(output);
 }
+
 
 int main(){
   std::vector<std::vector<int>> input;
+  input = {{4,7,6,0,1},
+	   {9,3,7,2,4},
+	   {6,4,12,14,13},
+	   {9,0,-1,2,4}};
+  processTest(input);
 
-  return 0;
+
+  input = {{4,7,6,0,1},
+	   {0,3,7,2,4},
+	   {6,4,12,14,13},
+	   {9,0,-1,2,4}};
+  processTest(input);
+
+  input = {{4,7},
+	   {0,3}};
+  processTest(input);
+
+  input = {{4}};
+  processTest(input);
+
+  input = {{0}};
+  processTest(input);
+
 }
