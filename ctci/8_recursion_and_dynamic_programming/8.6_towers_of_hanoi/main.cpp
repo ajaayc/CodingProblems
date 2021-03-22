@@ -28,7 +28,7 @@ void printTowers(std::vector<std::stack<unsigned>> towers){
 //Moves disks in startIndex to targetIndex, using bufferIndex as needed
 void towersOfHanoi_Helper(const unsigned numDisks, std::vector<std::stack<unsigned>>& towers, unsigned startIndex, unsigned bufferIndex, unsigned targetIndex){
   //Base case
-  if(towers[startIndex].size() == 3){
+  if(numDisks == 3){
     towers[targetIndex].push(towers[startIndex].top());
     towers[startIndex].pop();
     towers[bufferIndex].push(towers[startIndex].top());
@@ -46,8 +46,19 @@ void towersOfHanoi_Helper(const unsigned numDisks, std::vector<std::stack<unsign
     return;
   }
 
-  //
-  
+  //Solving towers of hanoi for N disks is same as solving towers of hanoi for N-1 disks where we move the top N-1 disks to the buffer
+  //tower (new target) and use the current targetIndex as the new buffer. Then we move the Nth disk to the targetTower and proceed to move the N-1 disks from the
+  //buffer tower to the target tower using the start tower as the new buffer tower
+
+
+  towersOfHanoi_Helper(numDisks - 1, towers, startIndex, targetIndex, bufferIndex);
+
+  //Move top of startIndex tower to the targetIndex tower
+  towers[targetIndex].push(towers[startIndex].top());
+  towers[startIndex].pop();
+
+  //Move towers from bufferIndex to targetIndex. Use startIndex as new buffer
+  towersOfHanoi_Helper(numDisks - 1, towers, bufferIndex, startIndex, targetIndex);
 }
 
 void towersOfHanoi(const unsigned numDisks, std::vector<std::stack<unsigned>>& towers){
@@ -56,7 +67,7 @@ void towersOfHanoi(const unsigned numDisks, std::vector<std::stack<unsigned>>& t
 
 
 int main(){
-  unsigned numDisks = 3;
+  unsigned numDisks = 27;
 
   std::vector<std::stack<unsigned>> towers(3, std::stack<unsigned>());
 
